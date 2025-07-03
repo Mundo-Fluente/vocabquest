@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VocabQuest - Aprenda Inglês Jogando</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+const { useState, useEffect } = React;
+        const { Play, Trophy, User, Book, Settings, Home, Target, Star, CheckCircle, X, Volume2, Plus } = lucideReact;
+
+        const VocabQuest = () => {
+            const [currentScreen, setCurrentScreen] = useState('home');
+            const [user, setUser] = useState({ name: 'João', level: 5, points: 1250, streak: 7 });
+            const [currentGame, setCurrentGame] = useState(null);
+            const [gameData, setGameData] = useState(null);
+            const [userAnswer, setUserAnswer] = useState('');
+            const [feedback, setFeedback] = useState('');
+            const [showCorrect, setShowCorrect] = useState(false);
+
+            const wordBank = [
+                { english: 'strength', portuguese: 'força', pronunciation: '/strɛŋθ/', context: 'Physical fitness requires both strength and endurance.', type: 'noun' },
+                { english: 'throughout', portuguese: 'ao longo de', pronunciation: '/θruˈaʊt/', context: 'It rained throughout the entire day.', type: 'preposition' },
+                { english: 'although', portuguese: 'embora', pronunciation: '/ɔlˈðoʊ/', context: 'Although it was cold, we went for a walk.', type: 'conjunction' },
+                { english: 'whether', portuguese: 'se', pronunciation: '/ˈwɛðər/', context: 'I don\'t know whether she will come to the party.', type: 'conjunction' },
+                { english: 'thought', portuguese: 'pensamento', pronunciation: '/θɔt/', context: 'That\'s an interesting thought about the problem.', type: 'noun' },
+                { english: 'brought', portuguese: 'trouxe', pronunciation: '/brɔt/', context: 'She brought cookies to the meeting.', type: 'verb' },
+                { english: 'growth', portuguese: 'crescimento', pronunciation: '/groʊθ/', context: 'The company showed significant growth this year.', type: 'noun' },
+                { english: 'breakthrough', portuguese: 'descoberta', pronunciation: '/ˈbreɪkθru/', context: 'Scientists made a breakthrough in cancer research.', type: 'noun' },
+                { english: 'worth', portuguese: 'valor', pronunciation: '/wɜrθ/', context: 'This book is worth reading twice.', type: 'noun' },
+                { english: 'earth', portuguese: 'terra', pronunciation: '/ɜrθ/', context: 'The Earth rotates around the sun.', type: 'noun' }
+            ];
+
+            const [userWords, setUserWords] = useState([]);
+            const [ranking, setRanking] = useState([
+                { name: 'Ana Silva', points: 1580, level: 7 },
+                { name: 'Carlos Mendes', points: 1320, level: 6 },
+                { name: 'João (Você)', points: 1250, level: 5 },
+                { name: 'Maria Santos', points: 1100, level: 5 },
+                { name: 'Pedro Lima', points: 890, level: 4 }
+            ]);
+const getRandomWord = () => {
+                const allWords = [...wordBank, ...userWords];
+                return allWords[Math.floor(Math.random() * allWords.length)];
+            };
+
+            const playPronunciation = (word) => {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(word.english);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.8;
+                    speechSynthesis.speak(utterance);
+                }
+            };
+
+            const startGame = (gameType) => {
+                const word = getRandomWord();
+                setCurrentGame(gameType);
+                setGameData(word);
+                setUserAnswer('');
+                setFeedback('');
+                setShowCorrect(false);
+                setCurrentScreen('game');
+            };
+
+            const generateMultipleChoice = (correctWord) => {
+                const allWords = [...wordBank, ...userWords];
+                const options = [correctWord.portuguese];
+                
+                while (options.length < 4) {
+                    const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+                    if (!options.includes(randomWord.portuguese)) {
+                        options.push(randomWord.portuguese);
+                    }
+                }
+                
+                return options.sort(() => Math.random() - 0.5);
+            };
+
+            const checkAnswer = (answer) => {
+                if (!gameData) return;
+
+                if (currentGame === 'multiple-choice') {
+                    if (answer === gameData.portuguese) {
+                        setFeedback('Correto! 🎉');
+                        setUser(prev => ({ ...prev, points: prev.points + 10 }));
+                    } else {
+                        setFeedback('Incorreto! Tente novamente.');
+                        setShowCorrect(true);
+                    }
+                } else if (currentGame === 'translation') {
+                    const normalizedAnswer = answer.toLowerCase().trim();
+                    const normalizedCorrect = gameData.english.toLowerCase().trim();
+                    
+                    if (normalizedAnswer === normalizedCorrect) {
+                        setFeedback('Perfeito! 🎉');
+                        setUser(prev => ({ ...prev, points: prev.points + 15 }));
+                    } else {
+                        setFeedback('Não é bem assim. Tente novamente!');
+                        setUserAnswer('');
+                    }
+                }
+            };
+
+            const addCustomWord = (english, portuguese, context) => {
+                const newWord = {
+                    english: english.toLowerCase(),
+                    portuguese: portuguese.toLowerCase(),
+                    context: context || `Example with ${english}.`,
+                    pronunciation: `/${english}/`,
+                    type: 'custom'
+                };
+                setUserWords(prev => [...prev, newWord]);
+            };
+const renderHome = () => (
+                React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-white' },
+                    React.createElement('div', { className: 'p-4 flex justify-between items-center' },
+                        React.createElement('div', null,
+                            React.createElement('h1', { className: 'text-2xl font-bold' }, 'VocabQuest'),
+                            React.createElement('p', { className: 'text-blue-100' }, `Olá, ${user.name}!`)
+                        ),
+                        React.createElement('div', { className: 'text-right' },
+                            React.createElement('div', { className: 'flex items-center gap-2' },
+                                React.createElement(Star, { className: 'w-5 h-5 text-yellow-300' }),
+                                React.createElement('span', { className: 'font-bold' }, user.points)
+                            ),
+                            React.createElement('p', { className: 'text-sm text-blue-100' }, `Nível ${user.level}`)
+                        )
+                    ),
+                    React.createElement('div', { className: 'mx-4 mb-6 bg-white/20 backdrop-blur-sm rounded-xl p-4' },
+                        React.createElement('div', { className: 'flex justify-between' },
+                            React.createElement('div', { className: 'text-center' },
+                                React.createElement('div', { className: 'text-2xl font-bold' }, user.streak),
+                                React.createElement('div', { className: 'text-sm text-blue-100' }, 'Dias seguidos')
+                            ),
+                            React.createElement('div', { className: 'text-center' },
+                                React.createElement('div', { className: 'text-2xl font-bold' }, wordBank.length + userWords.length),
+                                React.createElement('div', { className: 'text-sm text-blue-100' }, 'Palavras')
+                            ),
+                            React.createElement('div', { className: 'text-center' },
+                                React.createElement('div', { className: 'text-2xl font-bold' }, Math.floor(user.points / 100)),
+                                React.createElement('div', { className: 'text-sm text-blue-100' }, 'Conquistas')
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: 'mx-4 mb-6 bg-green-500/80 backdrop-blur-sm rounded-xl p-4' },
+                        React.createElement('div', { className: 'flex items-center gap-3' },
+                            React.createElement(Target, { className: 'w-6 h-6' }),
+                            React.createElement('div', null,
+                                React.createElement('h3', { className: 'font-semibold' }, 'Meta Diária'),
+                                React.createElement('p', { className: 'text-sm text-green-100' }, '7/10 palavras praticadas hoje')
+                            )
+                        ),
+                        React.createElement('div', { className: 'mt-2 bg-white/20 rounded-full h-2' },
+                            React.createElement('div', { className: 'bg-white rounded-full h-2 w-3/4' })
+                        )
+                    ),
+                    React.createElement('div', { className: 'mx-4 space-y-4' },
+                        React.createElement('h2', { className: 'text-xl font-semibold mb-4' }, 'Escolha um Jogo'),
+                        React.createElement('button', {
+                            onClick: () => startGame('multiple-choice'),
+                            className: 'w-full bg-white/20 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 hover:bg-white/30 transition-all'
+                        },
+                            React.createElement('div', { className: 'bg-orange-500 rounded-lg p-3' },
+                                React.createElement(CheckCircle, { className: 'w-6 h-6 text-white' })
+                            ),
+                            React.createElement('div', { className: 'text-left' },
+                                React.createElement('h3', { className: 'font-semibold' }, 'Quiz Múltipla Escolha'),
+                                React.createElement('p', { className: 'text-sm text-blue-100' }, 'Escolha a tradução correta')
+                            )
+                        ),
+                        React.createElement('button', {
+                            onClick: () => startGame('translation'),
+                            className: 'w-full bg-white/20 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 hover:bg-white/30 transition-all'
+                        },
+                            React.createElement('div', { className: 'bg-green-500 rounded-lg p-3' },
+                                React.createElement(Book, { className: 'w-6 h-6 text-white' })
+                            ),
+                            React.createElement('div', { className: 'text-left' },
+                                React.createElement('h3', { className: 'font-semibold' }, 'Tradução Escrita'),
+                                React.createElement('p', { className: 'text-sm text-blue-100' }, 'Escreva a palavra em inglês')
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: 'fixed bottom-0 left-0 right-0 bg-white/20 backdrop-blur-sm border-t border-white/20' },
+                        React.createElement('div', { className: 'flex justify-around py-2' },
+                            React.createElement('button', {
+                                onClick: () => setCurrentScreen('home'),
+                                className: `p-3 rounded-lg ${currentScreen === 'home' ? 'bg-white/20' : ''}`
+                            }, React.createElement(Home, { className: 'w-6 h-6' })),
+                            React.createElement('button', {
+                                onClick: () => setCurrentScreen('ranking'),
+                                className: `p-3 rounded-lg ${currentScreen === 'ranking' ? 'bg-white/20' : ''}`
+                            }, React.createElement(Trophy, { className: 'w-6 h-6' })),
+                            React.createElement('button', {
+                                onClick: () => setCurrentScreen('profile'),
+                                className: `p-3 rounded-lg ${currentScreen === 'profile' ? 'bg-white/20' : ''}`
+                            }, React.createElement(User, { className: 'w-6 h-6' })),
+                            React.createElement('button', {
+                                onClick: () => setCurrentScreen('add-word'),
+                                className: `p-3 rounded-lg ${currentScreen === 'add-word' ? 'bg-white/20' : ''}`
+                            }, React.createElement(Plus, { className: 'w-6 h-6' }))
+                        )
+                    )
+                )
+            );
+const renderGame = () => {
+                if (!gameData) return null;
+
+                if (currentGame === 'multiple-choice') {
+                    const options = generateMultipleChoice(gameData);
+                    
+                    return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-white p-4' },
+                        React.createElement('div', { className: 'flex items-center gap-4 mb-6' },
+                            React.createElement('button', {
+                                onClick: () => setCurrentScreen('home'),
+                                className: 'bg-white/20 rounded-lg p-2'
+                            }, React.createElement(X, { className: 'w-6 h-6' })),
+                            React.createElement('h2', { className: 'text-xl font-semibold' }, 'Quiz Múltipla Escolha')
+                        ),
+                        React.createElement('div', { className: 'bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6' },
+                            React.createElement('div', { className: 'flex items-center gap-3 mb-4' },
+                                React.createElement('button', {
+                                    onClick: () => playPronunciation(gameData),
+                                    className: 'bg-blue-500 rounded-lg p-2'
+                                }, React.createElement(Volume2, { className: 'w-5 h-5' })),
+                                React.createElement('div', null,
+                                    React.createElement('h3', { className: 'text-2xl font-bold' }, gameData.english),
+                                    React.createElement('p', { className: 'text-blue-100' }, gameData.pronunciation)
+                                )
+                            ),
+                            React.createElement('div', { className: 'bg-blue-500/30 rounded-lg p-4 mb-4' },
+                                React.createElement('p', { className: 'italic' }, `"${gameData.context}"`)
+                            )
+                        ),
+                        React.createElement('div', { className: 'space-y-3 mb-6' },
+                            options.map((option, index) =>
+                                React.createElement('button', {
+                                    key: index,
+                                    onClick: () => checkAnswer(option),
+                                    className: 'w-full bg-white/20 backdrop-blur-sm rounded-xl p-4 text-left hover:bg-white/30 transition-all'
+                                }, option)
+                            )
+                        ),
+                        feedback && React.createElement('div', {
+                            className: `p-4 rounded-xl mb-4 ${feedback.includes('Correto') ? 'bg-green-500/80' : 'bg-red-500/80'}`
+                        },
+                            React.createElement('p', { className: 'font-semibold' }, feedback),
+                            showCorrect && React.createElement('p', { className: 'mt-2' }, `Resposta correta: ${gameData.portuguese}`)
+                        )
+                    );
+                }
+
+                if (currentGame === 'translation') {
+                    return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-green-500 to-teal-600 text-white p-4' },
+                        React.createElement('div', { className: 'flex items-center gap-4 mb-6' },
+                            React.createElement('button', {
+                                onClick: () => setCurrentScreen('home'),
+                                className: 'bg-white/20 rounded-lg p-2'
+                            }, React.createElement(X, { className: 'w-6 h-6' })),
+                            React.createElement('h2', { className: 'text-xl font-semibold' }, 'Tradução Escrita')
+                        ),
+                        React.createElement('div', { className: 'bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6' },
+                            React.createElement('div', { className: 'text-center mb-4' },
+                                React.createElement('h3', { className: 'text-xl font-semibold mb-2' }, 'Traduza para o inglês:'),
+                                React.createElement('p', { className: 'text-3xl font-bold text-yellow-200' }, gameData.portuguese)
+                            ),
+                            React.createElement('div', { className: 'bg-green-500/30 rounded-lg p-4' },
+                                React.createElement('p', { className: 'italic' }, `Contexto: "${gameData.context}"`)
+                            )
+                        ),
+                        React.createElement('div', { className: 'space-y-4' },
+                            React.createElement('input', {
+                                type: 'text',
+                                value: userAnswer,
+                                onChange: (e) => setUserAnswer(e.target.value),
+                                placeholder: 'Digite a palavra em inglês...',
+                                className: 'w-full p-4 rounded-xl text-gray-800 text-lg',
+                                onKeyPress: (e) => e.key === 'Enter' && checkAnswer(userAnswer)
+                            }),
+                            React.createElement('button', {
+                                onClick: () => checkAnswer(userAnswer),
+                                className: 'w-full bg-yellow-500 text-gray-800 font-bold py-4 rounded-xl'
+                            }, 'Verificar Resposta')
+                        ),
+                        feedback && React.createElement('div', {
+                            className: `mt-4 p-4 rounded-xl ${feedback.includes('Perfeito') ? 'bg-green-500/80' : 'bg-orange-500/80'}`
+                        },
+                            React.createElement('p', { className: 'font-semibold' }, feedback)
+                        )
+                    );
+                }
+
+                return null;
+            };
+const renderRanking = () => (
+                React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-purple-500 to-pink-600 text-white p-4' },
+                    React.createElement('h2', { className: 'text-2xl font-bold mb-6 text-center' }, '🏆 Ranking'),
+                    React.createElement('div', { className: 'space-y-4' },
+                        ranking.map((player, index) =>
+                            React.createElement('div', {
+                                key: index,
+                                className: `bg-white/20 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 ${player.name.includes('Você') ? 'bg-yellow-500/30 border-2 border-yellow-400' : ''}`
+                            },
+                                React.createElement('div', {
+                                    className: `w-8 h-8 rounded-full flex items-center justify-center font-bold ${index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-orange-600' : 'bg-gray-600'}`
+                                }, index + 1),
+                                React.createElement('div', { className: 'flex-1' },
+                                    React.createElement('h3', { className: 'font-semibold' }, player.name),
+                                    React.createElement('p', { className: 'text-sm text-purple-100' }, `Nível ${player.level}`)
+                                ),
+                                React.createElement('div', { className: 'text-right' },
+                                    React.createElement('div', { className: 'flex items-center gap-1' },
+                                        React.createElement(Star, { className: 'w-4 h-4 text-yellow-300' }),
+                                        React.createElement('span', { className: 'font-bold' }, player.points)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+
+            const renderProfile = () => (
+                React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-4' },
+                    React.createElement('h2', { className: 'text-2xl font-bold mb-6 text-center' }, '👤 Perfil'),
+                    React.createElement('div', { className: 'bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6 text-center' },
+                        React.createElement('div', { className: 'w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-gray-800' },
+                            user.name[0]
+                        ),
+                        React.createElement('h3', { className: 'text-xl font-bold' }, user.name),
+                        React.createElement('p', { className: 'text-blue-100' }, `Nível ${user.level} • ${user.points} pontos`)
+                    )
+                )
+            );
+const renderAddWord = () => {
+                const [newEnglish, setNewEnglish] = useState('');
+                const [newPortuguese, setNewPortuguese] = useState('');
+                const [newContext, setNewContext] = useState('');
+
+                const handleAddWord = () => {
+                    if (newEnglish && newPortuguese) {
+                        addCustomWord(newEnglish, newPortuguese, newContext);
+                        setNewEnglish('');
+                        setNewPortuguese('');
+                        setNewContext('');
+                        alert('Palavra adicionada com sucesso! 🎉');
+                    }
+                };
+
+                return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-green-500 to-emerald-600 text-white p-4' },
+                    React.createElement('h2', { className: 'text-2xl font-bold mb-6 text-center' }, '➕ Adicionar Palavra'),
+                    React.createElement('div', { className: 'bg-white/20 backdrop-blur-sm rounded-xl p-6 space-y-4' },
+                        React.createElement('div', null,
+                            React.createElement('label', { className: 'block text-sm font-semibold mb-2' }, 'Palavra em Inglês'),
+                            React.createElement('input', {
+                                type: 'text',
+                                value: newEnglish,
+                                onChange: (e) => setNewEnglish(e.target.value),
+                                placeholder: 'Ex: wonderful',
+                                className: 'w-full p-3 rounded-lg text-gray-800'
+                            })
+                        ),
+                        React.createElement('div', null,
+                            React.createElement('label', { className: 'block text-sm font-semibold mb-2' }, 'Tradução em Português'),
+                            React.createElement('input', {
+                                type: 'text',
+                                value: newPortuguese,
+                                onChange: (e) => setNewPortuguese(e.target.value),
+                                placeholder: 'Ex: maravilhoso',
+                                className: 'w-full p-3 rounded-lg text-gray-800'
+                            })
+                        ),
+                        React.createElement('div', null,
+                            React.createElement('label', { className: 'block text-sm font-semibold mb-2' }, 'Contexto (opcional)'),
+                            React.createElement('textarea', {
+                                value: newContext,
+                                onChange: (e) => setNewContext(e.target.value),
+                                placeholder: 'Ex: The sunset was wonderful to watch.',
+                                className: 'w-full p-3 rounded-lg text-gray-800 h-20'
+                            })
+                        ),
+                        React.createElement('button', {
+                            onClick: handleAddWord,
+                            className: 'w-full bg-yellow-500 text-gray-800 font-bold py-4 rounded-lg'
+                        }, 'Adicionar Palavra')
+                    )
+                );
+            };
+
+            return React.createElement('div', { className: 'font-sans max-w-md mx-auto' },
+                currentScreen === 'home' && renderHome(),
+                currentScreen === 'game' && renderGame(),
+                currentScreen === 'ranking' && renderRanking(),
+                currentScreen === 'profile' && renderProfile(),
+                currentScreen === 'add-word' && renderAddWord()
+            );
+        };
+
+        ReactDOM.render(React.createElement(VocabQuest), document.getElementById('root'));
+    </script>
+</body>
+</html>
