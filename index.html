@@ -1,413 +1,575 @@
+Perfeito! Agora vamos substituir por um código mais robusto que não depende de bibliotecas externas:
+
+## **Apague todo o código atual e cole este novo:**
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VocabQuest - Aprenda Inglês Jogando</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .points {
+            text-align: right;
+        }
+        
+        .stats-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .goal-card {
+            background: rgba(34, 197, 94, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .goal-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 70%;
+            border-radius: 10px;
+        }
+        
+        .games-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .game-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            width: 100%;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .game-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .game-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .orange { background: #f97316; }
+        .green { background: #22c55e; }
+        .purple { background: #a855f7; }
+        .blue { background: #3b82f6; }
+        
+        .game-info {
+            text-align: left;
+        }
+        
+        .game-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .game-desc {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .nav-button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        
+        .nav-button.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .game-screen {
+            display: none;
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .game-screen.active {
+            display: block;
+        }
+        
+        .game-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .word-card {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .word-english {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .word-pronunciation {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .word-context {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            font-style: italic;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .option-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .option-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .feedback.correct {
+            background: rgba(34, 197, 94, 0.8);
+        }
+        
+        .feedback.incorrect {
+            background: rgba(239, 68, 68, 0.8);
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .submit-button {
+            background: #fbbf24;
+            color: #1f2937;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-const { useState, useEffect } = React;
-        const { Play, Trophy, User, Book, Settings, Home, Target, Star, CheckCircle, X, Volume2, Plus } = lucideReact;
+    <div id="home-screen" class="container">
+        <div class="header">
+            <div>
+                <h1 class="title">VocabQuest</h1>
+                <p>Olá, João!</p>
+            </div>
+            <div class="points">
+                <div>⭐ <span id="points">1250</span></div>
+                <div>Nível 5</div>
+            </div>
+        </div>
+        
+        <div class="stats-card">
+            <div class="stat-item">
+                <div class="stat-number">7</div>
+                <div class="stat-label">Dias seguidos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">10</div>
+                <div class="stat-label">Palavras</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Conquistas</div>
+            </div>
+        </div>
+        
+        <div class="goal-card">
+            <div class="goal-title">🎯 Meta Diária</div>
+            <div>7/10 palavras praticadas hoje</div>
+            <div class="progress-bar" style="margin-top: 10px;">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div class="games-section">
+            <h2>Escolha um Jogo</h2>
+            
+            <button class="game-button" onclick="startGame('quiz')">
+                <div class="game-icon orange">✓</div>
+                <div class="game-info">
+                    <div class="game-name">Quiz Múltipla Escolha</div>
+                    <div class="game-desc">Escolha a tradução correta</div>
+                </div>
+            </button>
+            
+            <button class="game-button" onclick="startGame('translation')">
+                <div class="game-icon green">📝</div>
+                <div class="game-info">
+                    <div class="game-name">Tradução Escrita</div>
+                    <div class="game-desc">Escreva a palavra em inglês</div>
+                </div>
+            </button>
+        </div>
+    </div>
+    
+    <div id="quiz-screen" class="game-screen">
+        <div class="game-header">
+            <button class="back-button" onclick="goHome()">×</button>
+            <h2>Quiz Múltipla Escolha</h2>
+        </div>
+        
+        <div class="word-card">
+            <div class="word-english" id="quiz-word"></div>
+            <div class="word-pronunciation" id="quiz-pronunciation"></div>
+            <div class="word-context" id="quiz-context"></div>
+        </div>
+        
+        <div class="options" id="quiz-options"></div>
+        
+        <div id="quiz-feedback" class="feedback hidden"></div>
+    </div>
+    
+    <div id="translation-screen" class="game-screen">
+        <div class="game-header">
+            <button class="back-button" onclick="goHome()">×</button>
+            <h2>Tradução Escrita</h2>
+        </div>
+        
+        <div class="word-card">
+            <div style="margin-bottom: 15px;">Traduza para o inglês:</div>
+            <div class="word-english" id="translation-portuguese"></div>
+            <div class="word-context" id="translation-context"></div>
+        </div>
+        
+        <input type="text" class="input-field" id="translation-input" placeholder="Digite a palavra em inglês...">
+        <button class="submit-button" onclick="checkTranslation()">Verificar Resposta</button>
+        
+        <div id="translation-feedback" class="feedback hidden"></div>
+    </div>
+    
+    <div class="bottom-nav">
+        <button class="nav-button active">🏠</button>
+        <button class="nav-button">🏆</button>
+        <button class="nav-button">👤</button>
+        <button class="nav-button">➕</button>
+    </div>
 
-        const VocabQuest = () => {
-            const [currentScreen, setCurrentScreen] = useState('home');
-            const [user, setUser] = useState({ name: 'João', level: 5, points: 1250, streak: 7 });
-            const [currentGame, setCurrentGame] = useState(null);
-            const [gameData, setGameData] = useState(null);
-            const [userAnswer, setUserAnswer] = useState('');
-            const [feedback, setFeedback] = useState('');
-            const [showCorrect, setShowCorrect] = useState(false);
-
-            const wordBank = [
-                { english: 'strength', portuguese: 'força', pronunciation: '/strɛŋθ/', context: 'Physical fitness requires both strength and endurance.', type: 'noun' },
-                { english: 'throughout', portuguese: 'ao longo de', pronunciation: '/θruˈaʊt/', context: 'It rained throughout the entire day.', type: 'preposition' },
-                { english: 'although', portuguese: 'embora', pronunciation: '/ɔlˈðoʊ/', context: 'Although it was cold, we went for a walk.', type: 'conjunction' },
-                { english: 'whether', portuguese: 'se', pronunciation: '/ˈwɛðər/', context: 'I don\'t know whether she will come to the party.', type: 'conjunction' },
-                { english: 'thought', portuguese: 'pensamento', pronunciation: '/θɔt/', context: 'That\'s an interesting thought about the problem.', type: 'noun' },
-                { english: 'brought', portuguese: 'trouxe', pronunciation: '/brɔt/', context: 'She brought cookies to the meeting.', type: 'verb' },
-                { english: 'growth', portuguese: 'crescimento', pronunciation: '/groʊθ/', context: 'The company showed significant growth this year.', type: 'noun' },
-                { english: 'breakthrough', portuguese: 'descoberta', pronunciation: '/ˈbreɪkθru/', context: 'Scientists made a breakthrough in cancer research.', type: 'noun' },
-                { english: 'worth', portuguese: 'valor', pronunciation: '/wɜrθ/', context: 'This book is worth reading twice.', type: 'noun' },
-                { english: 'earth', portuguese: 'terra', pronunciation: '/ɜrθ/', context: 'The Earth rotates around the sun.', type: 'noun' }
-            ];
-
-            const [userWords, setUserWords] = useState([]);
-            const [ranking, setRanking] = useState([
-                { name: 'Ana Silva', points: 1580, level: 7 },
-                { name: 'Carlos Mendes', points: 1320, level: 6 },
-                { name: 'João (Você)', points: 1250, level: 5 },
-                { name: 'Maria Santos', points: 1100, level: 5 },
-                { name: 'Pedro Lima', points: 890, level: 4 }
-            ]);
-const getRandomWord = () => {
-                const allWords = [...wordBank, ...userWords];
-                return allWords[Math.floor(Math.random() * allWords.length)];
-            };
-
-            const playPronunciation = (word) => {
-                if ('speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance(word.english);
-                    utterance.lang = 'en-US';
-                    utterance.rate = 0.8;
-                    speechSynthesis.speak(utterance);
+    <script>
+        const words = [
+            {
+                english: 'strength',
+                portuguese: 'força',
+                pronunciation: '/strɛŋθ/',
+                context: 'Physical fitness requires both strength and endurance.'
+            },
+            {
+                english: 'throughout',
+                portuguese: 'ao longo de',
+                pronunciation: '/θruˈaʊt/',
+                context: 'It rained throughout the entire day.'
+            },
+            {
+                english: 'although',
+                portuguese: 'embora',
+                pronunciation: '/ɔlˈðoʊ/',
+                context: 'Although it was cold, we went for a walk.'
+            },
+            {
+                english: 'whether',
+                portuguese: 'se',
+                pronunciation: '/ˈwɛðər/',
+                context: 'I don\'t know whether she will come to the party.'
+            },
+            {
+                english: 'thought',
+                portuguese: 'pensamento',
+                pronunciation: '/θɔt/',
+                context: 'That\'s an interesting thought about the problem.'
+            },
+            {
+                english: 'brought',
+                portuguese: 'trouxe',
+                pronunciation: '/brɔt/',
+                context: 'She brought cookies to the meeting.'
+            },
+            {
+                english: 'growth',
+                portuguese: 'crescimento',
+                pronunciation: '/groʊθ/',
+                context: 'The company showed significant growth this year.'
+            },
+            {
+                english: 'worth',
+                portuguese: 'valor',
+                pronunciation: '/wɜrθ/',
+                context: 'This book is worth reading twice.'
+            },
+            {
+                english: 'earth',
+                portuguese: 'terra',
+                pronunciation: '/ɜrθ/',
+                context: 'The Earth rotates around the sun.'
+            }
+        ];
+        
+        let currentWord = null;
+        let points = 1250;
+        
+        function getRandomWord() {
+            return words[Math.floor(Math.random() * words.length)];
+        }
+        
+        function startGame(gameType) {
+            currentWord = getRandomWord();
+            document.getElementById('home-screen').style.display = 'none';
+            
+            if (gameType === 'quiz') {
+                showQuizGame();
+            } else if (gameType === 'translation') {
+                showTranslationGame();
+            }
+        }
+        
+        function showQuizGame() {
+            document.getElementById('quiz-screen').classList.add('active');
+            document.getElementById('quiz-word').textContent = currentWord.english;
+            document.getElementById('quiz-pronunciation').textContent = currentWord.pronunciation;
+            document.getElementById('quiz-context').textContent = '"' + currentWord.context + '"';
+            
+            const options = generateOptions(currentWord);
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => checkQuizAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+            
+            document.getElementById('quiz-feedback').classList.add('hidden');
+        }
+        
+        function generateOptions(correctWord) {
+            const options = [correctWord.portuguese];
+            const otherWords = words.filter(w => w.english !== correctWord.english);
+            
+            while (options.length < 4) {
+                const randomWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+                if (!options.includes(randomWord.portuguese)) {
+                    options.push(randomWord.portuguese);
                 }
-            };
-
-            const startGame = (gameType) => {
-                const word = getRandomWord();
-                setCurrentGame(gameType);
-                setGameData(word);
-                setUserAnswer('');
-                setFeedback('');
-                setShowCorrect(false);
-                setCurrentScreen('game');
-            };
-
-            const generateMultipleChoice = (correctWord) => {
-                const allWords = [...wordBank, ...userWords];
-                const options = [correctWord.portuguese];
-                
-                while (options.length < 4) {
-                    const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-                    if (!options.includes(randomWord.portuguese)) {
-                        options.push(randomWord.portuguese);
-                    }
-                }
-                
-                return options.sort(() => Math.random() - 0.5);
-            };
-
-            const checkAnswer = (answer) => {
-                if (!gameData) return;
-
-                if (currentGame === 'multiple-choice') {
-                    if (answer === gameData.portuguese) {
-                        setFeedback('Correto! 🎉');
-                        setUser(prev => ({ ...prev, points: prev.points + 10 }));
-                    } else {
-                        setFeedback('Incorreto! Tente novamente.');
-                        setShowCorrect(true);
-                    }
-                } else if (currentGame === 'translation') {
-                    const normalizedAnswer = answer.toLowerCase().trim();
-                    const normalizedCorrect = gameData.english.toLowerCase().trim();
-                    
-                    if (normalizedAnswer === normalizedCorrect) {
-                        setFeedback('Perfeito! 🎉');
-                        setUser(prev => ({ ...prev, points: prev.points + 15 }));
-                    } else {
-                        setFeedback('Não é bem assim. Tente novamente!');
-                        setUserAnswer('');
-                    }
-                }
-            };
-
-            const addCustomWord = (english, portuguese, context) => {
-                const newWord = {
-                    english: english.toLowerCase(),
-                    portuguese: portuguese.toLowerCase(),
-                    context: context || `Example with ${english}.`,
-                    pronunciation: `/${english}/`,
-                    type: 'custom'
-                };
-                setUserWords(prev => [...prev, newWord]);
-            };
-const renderHome = () => (
-                React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-white' },
-                    React.createElement('div', { className: 'p-4 flex justify-between items-center' },
-                        React.createElement('div', null,
-                            React.createElement('h1', { className: 'text-2xl font-bold' }, 'VocabQuest'),
-                            React.createElement('p', { className: 'text-blue-100' }, `Olá, ${user.name}!`)
-                        ),
-                        React.createElement('div', { className: 'text-right' },
-                            React.createElement('div', { className: 'flex items-center gap-2' },
-                                React.createElement(Star, { className: 'w-5 h-5 text-yellow-300' }),
-                                React.createElement('span', { className: 'font-bold' }, user.points)
-                            ),
-                            React.createElement('p', { className: 'text-sm text-blue-100' }, `Nível ${user.level}`)
-                        )
-                    ),
-                    React.createElement('div', { className: 'mx-4 mb-6 bg-white/20 backdrop-blur-sm rounded-xl p-4' },
-                        React.createElement('div', { className: 'flex justify-between' },
-                            React.createElement('div', { className: 'text-center' },
-                                React.createElement('div', { className: 'text-2xl font-bold' }, user.streak),
-                                React.createElement('div', { className: 'text-sm text-blue-100' }, 'Dias seguidos')
-                            ),
-                            React.createElement('div', { className: 'text-center' },
-                                React.createElement('div', { className: 'text-2xl font-bold' }, wordBank.length + userWords.length),
-                                React.createElement('div', { className: 'text-sm text-blue-100' }, 'Palavras')
-                            ),
-                            React.createElement('div', { className: 'text-center' },
-                                React.createElement('div', { className: 'text-2xl font-bold' }, Math.floor(user.points / 100)),
-                                React.createElement('div', { className: 'text-sm text-blue-100' }, 'Conquistas')
-                            )
-                        )
-                    ),
-                    React.createElement('div', { className: 'mx-4 mb-6 bg-green-500/80 backdrop-blur-sm rounded-xl p-4' },
-                        React.createElement('div', { className: 'flex items-center gap-3' },
-                            React.createElement(Target, { className: 'w-6 h-6' }),
-                            React.createElement('div', null,
-                                React.createElement('h3', { className: 'font-semibold' }, 'Meta Diária'),
-                                React.createElement('p', { className: 'text-sm text-green-100' }, '7/10 palavras praticadas hoje')
-                            )
-                        ),
-                        React.createElement('div', { className: 'mt-2 bg-white/20 rounded-full h-2' },
-                            React.createElement('div', { className: 'bg-white rounded-full h-2 w-3/4' })
-                        )
-                    ),
-                    React.createElement('div', { className: 'mx-4 space-y-4' },
-                        React.createElement('h2', { className: 'text-xl font-semibold mb-4' }, 'Escolha um Jogo'),
-                        React.createElement('button', {
-                            onClick: () => startGame('multiple-choice'),
-                            className: 'w-full bg-white/20 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 hover:bg-white/30 transition-all'
-                        },
-                            React.createElement('div', { className: 'bg-orange-500 rounded-lg p-3' },
-                                React.createElement(CheckCircle, { className: 'w-6 h-6 text-white' })
-                            ),
-                            React.createElement('div', { className: 'text-left' },
-                                React.createElement('h3', { className: 'font-semibold' }, 'Quiz Múltipla Escolha'),
-                                React.createElement('p', { className: 'text-sm text-blue-100' }, 'Escolha a tradução correta')
-                            )
-                        ),
-                        React.createElement('button', {
-                            onClick: () => startGame('translation'),
-                            className: 'w-full bg-white/20 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 hover:bg-white/30 transition-all'
-                        },
-                            React.createElement('div', { className: 'bg-green-500 rounded-lg p-3' },
-                                React.createElement(Book, { className: 'w-6 h-6 text-white' })
-                            ),
-                            React.createElement('div', { className: 'text-left' },
-                                React.createElement('h3', { className: 'font-semibold' }, 'Tradução Escrita'),
-                                React.createElement('p', { className: 'text-sm text-blue-100' }, 'Escreva a palavra em inglês')
-                            )
-                        )
-                    ),
-                    React.createElement('div', { className: 'fixed bottom-0 left-0 right-0 bg-white/20 backdrop-blur-sm border-t border-white/20' },
-                        React.createElement('div', { className: 'flex justify-around py-2' },
-                            React.createElement('button', {
-                                onClick: () => setCurrentScreen('home'),
-                                className: `p-3 rounded-lg ${currentScreen === 'home' ? 'bg-white/20' : ''}`
-                            }, React.createElement(Home, { className: 'w-6 h-6' })),
-                            React.createElement('button', {
-                                onClick: () => setCurrentScreen('ranking'),
-                                className: `p-3 rounded-lg ${currentScreen === 'ranking' ? 'bg-white/20' : ''}`
-                            }, React.createElement(Trophy, { className: 'w-6 h-6' })),
-                            React.createElement('button', {
-                                onClick: () => setCurrentScreen('profile'),
-                                className: `p-3 rounded-lg ${currentScreen === 'profile' ? 'bg-white/20' : ''}`
-                            }, React.createElement(User, { className: 'w-6 h-6' })),
-                            React.createElement('button', {
-                                onClick: () => setCurrentScreen('add-word'),
-                                className: `p-3 rounded-lg ${currentScreen === 'add-word' ? 'bg-white/20' : ''}`
-                            }, React.createElement(Plus, { className: 'w-6 h-6' }))
-                        )
-                    )
-                )
-            );
-const renderGame = () => {
-                if (!gameData) return null;
-
-                if (currentGame === 'multiple-choice') {
-                    const options = generateMultipleChoice(gameData);
-                    
-                    return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-white p-4' },
-                        React.createElement('div', { className: 'flex items-center gap-4 mb-6' },
-                            React.createElement('button', {
-                                onClick: () => setCurrentScreen('home'),
-                                className: 'bg-white/20 rounded-lg p-2'
-                            }, React.createElement(X, { className: 'w-6 h-6' })),
-                            React.createElement('h2', { className: 'text-xl font-semibold' }, 'Quiz Múltipla Escolha')
-                        ),
-                        React.createElement('div', { className: 'bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6' },
-                            React.createElement('div', { className: 'flex items-center gap-3 mb-4' },
-                                React.createElement('button', {
-                                    onClick: () => playPronunciation(gameData),
-                                    className: 'bg-blue-500 rounded-lg p-2'
-                                }, React.createElement(Volume2, { className: 'w-5 h-5' })),
-                                React.createElement('div', null,
-                                    React.createElement('h3', { className: 'text-2xl font-bold' }, gameData.english),
-                                    React.createElement('p', { className: 'text-blue-100' }, gameData.pronunciation)
-                                )
-                            ),
-                            React.createElement('div', { className: 'bg-blue-500/30 rounded-lg p-4 mb-4' },
-                                React.createElement('p', { className: 'italic' }, `"${gameData.context}"`)
-                            )
-                        ),
-                        React.createElement('div', { className: 'space-y-3 mb-6' },
-                            options.map((option, index) =>
-                                React.createElement('button', {
-                                    key: index,
-                                    onClick: () => checkAnswer(option),
-                                    className: 'w-full bg-white/20 backdrop-blur-sm rounded-xl p-4 text-left hover:bg-white/30 transition-all'
-                                }, option)
-                            )
-                        ),
-                        feedback && React.createElement('div', {
-                            className: `p-4 rounded-xl mb-4 ${feedback.includes('Correto') ? 'bg-green-500/80' : 'bg-red-500/80'}`
-                        },
-                            React.createElement('p', { className: 'font-semibold' }, feedback),
-                            showCorrect && React.createElement('p', { className: 'mt-2' }, `Resposta correta: ${gameData.portuguese}`)
-                        )
-                    );
-                }
-
-                if (currentGame === 'translation') {
-                    return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-green-500 to-teal-600 text-white p-4' },
-                        React.createElement('div', { className: 'flex items-center gap-4 mb-6' },
-                            React.createElement('button', {
-                                onClick: () => setCurrentScreen('home'),
-                                className: 'bg-white/20 rounded-lg p-2'
-                            }, React.createElement(X, { className: 'w-6 h-6' })),
-                            React.createElement('h2', { className: 'text-xl font-semibold' }, 'Tradução Escrita')
-                        ),
-                        React.createElement('div', { className: 'bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6' },
-                            React.createElement('div', { className: 'text-center mb-4' },
-                                React.createElement('h3', { className: 'text-xl font-semibold mb-2' }, 'Traduza para o inglês:'),
-                                React.createElement('p', { className: 'text-3xl font-bold text-yellow-200' }, gameData.portuguese)
-                            ),
-                            React.createElement('div', { className: 'bg-green-500/30 rounded-lg p-4' },
-                                React.createElement('p', { className: 'italic' }, `Contexto: "${gameData.context}"`)
-                            )
-                        ),
-                        React.createElement('div', { className: 'space-y-4' },
-                            React.createElement('input', {
-                                type: 'text',
-                                value: userAnswer,
-                                onChange: (e) => setUserAnswer(e.target.value),
-                                placeholder: 'Digite a palavra em inglês...',
-                                className: 'w-full p-4 rounded-xl text-gray-800 text-lg',
-                                onKeyPress: (e) => e.key === 'Enter' && checkAnswer(userAnswer)
-                            }),
-                            React.createElement('button', {
-                                onClick: () => checkAnswer(userAnswer),
-                                className: 'w-full bg-yellow-500 text-gray-800 font-bold py-4 rounded-xl'
-                            }, 'Verificar Resposta')
-                        ),
-                        feedback && React.createElement('div', {
-                            className: `mt-4 p-4 rounded-xl ${feedback.includes('Perfeito') ? 'bg-green-500/80' : 'bg-orange-500/80'}`
-                        },
-                            React.createElement('p', { className: 'font-semibold' }, feedback)
-                        )
-                    );
-                }
-
-                return null;
-            };
-const renderRanking = () => (
-                React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-purple-500 to-pink-600 text-white p-4' },
-                    React.createElement('h2', { className: 'text-2xl font-bold mb-6 text-center' }, '🏆 Ranking'),
-                    React.createElement('div', { className: 'space-y-4' },
-                        ranking.map((player, index) =>
-                            React.createElement('div', {
-                                key: index,
-                                className: `bg-white/20 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 ${player.name.includes('Você') ? 'bg-yellow-500/30 border-2 border-yellow-400' : ''}`
-                            },
-                                React.createElement('div', {
-                                    className: `w-8 h-8 rounded-full flex items-center justify-center font-bold ${index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-orange-600' : 'bg-gray-600'}`
-                                }, index + 1),
-                                React.createElement('div', { className: 'flex-1' },
-                                    React.createElement('h3', { className: 'font-semibold' }, player.name),
-                                    React.createElement('p', { className: 'text-sm text-purple-100' }, `Nível ${player.level}`)
-                                ),
-                                React.createElement('div', { className: 'text-right' },
-                                    React.createElement('div', { className: 'flex items-center gap-1' },
-                                        React.createElement(Star, { className: 'w-4 h-4 text-yellow-300' }),
-                                        React.createElement('span', { className: 'font-bold' }, player.points)
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-
-            const renderProfile = () => (
-                React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-4' },
-                    React.createElement('h2', { className: 'text-2xl font-bold mb-6 text-center' }, '👤 Perfil'),
-                    React.createElement('div', { className: 'bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6 text-center' },
-                        React.createElement('div', { className: 'w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-gray-800' },
-                            user.name[0]
-                        ),
-                        React.createElement('h3', { className: 'text-xl font-bold' }, user.name),
-                        React.createElement('p', { className: 'text-blue-100' }, `Nível ${user.level} • ${user.points} pontos`)
-                    )
-                )
-            );
-const renderAddWord = () => {
-                const [newEnglish, setNewEnglish] = useState('');
-                const [newPortuguese, setNewPortuguese] = useState('');
-                const [newContext, setNewContext] = useState('');
-
-                const handleAddWord = () => {
-                    if (newEnglish && newPortuguese) {
-                        addCustomWord(newEnglish, newPortuguese, newContext);
-                        setNewEnglish('');
-                        setNewPortuguese('');
-                        setNewContext('');
-                        alert('Palavra adicionada com sucesso! 🎉');
-                    }
-                };
-
-                return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-green-500 to-emerald-600 text-white p-4' },
-                    React.createElement('h2', { className: 'text-2xl font-bold mb-6 text-center' }, '➕ Adicionar Palavra'),
-                    React.createElement('div', { className: 'bg-white/20 backdrop-blur-sm rounded-xl p-6 space-y-4' },
-                        React.createElement('div', null,
-                            React.createElement('label', { className: 'block text-sm font-semibold mb-2' }, 'Palavra em Inglês'),
-                            React.createElement('input', {
-                                type: 'text',
-                                value: newEnglish,
-                                onChange: (e) => setNewEnglish(e.target.value),
-                                placeholder: 'Ex: wonderful',
-                                className: 'w-full p-3 rounded-lg text-gray-800'
-                            })
-                        ),
-                        React.createElement('div', null,
-                            React.createElement('label', { className: 'block text-sm font-semibold mb-2' }, 'Tradução em Português'),
-                            React.createElement('input', {
-                                type: 'text',
-                                value: newPortuguese,
-                                onChange: (e) => setNewPortuguese(e.target.value),
-                                placeholder: 'Ex: maravilhoso',
-                                className: 'w-full p-3 rounded-lg text-gray-800'
-                            })
-                        ),
-                        React.createElement('div', null,
-                            React.createElement('label', { className: 'block text-sm font-semibold mb-2' }, 'Contexto (opcional)'),
-                            React.createElement('textarea', {
-                                value: newContext,
-                                onChange: (e) => setNewContext(e.target.value),
-                                placeholder: 'Ex: The sunset was wonderful to watch.',
-                                className: 'w-full p-3 rounded-lg text-gray-800 h-20'
-                            })
-                        ),
-                        React.createElement('button', {
-                            onClick: handleAddWord,
-                            className: 'w-full bg-yellow-500 text-gray-800 font-bold py-4 rounded-lg'
-                        }, 'Adicionar Palavra')
-                    )
-                );
-            };
-
-            return React.createElement('div', { className: 'font-sans max-w-md mx-auto' },
-                currentScreen === 'home' && renderHome(),
-                currentScreen === 'game' && renderGame(),
-                currentScreen === 'ranking' && renderRanking(),
-                currentScreen === 'profile' && renderProfile(),
-                currentScreen === 'add-word' && renderAddWord()
-            );
-        };
-
-        ReactDOM.render(React.createElement(VocabQuest), document.getElementById('root'));
+            }
+            
+            return options.sort(() => Math.random() - 0.5);
+        }
+        
+        function checkQuizAnswer(answer) {
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+            
+            if (answer === currentWord.portuguese) {
+                feedback.textContent = 'Correto! 🎉';
+                feedback.className = 'feedback correct';
+                points += 10;
+                updatePoints();
+            } else {
+                feedback.textContent = 'Incorreto! A resposta correta é: ' + currentWord.portuguese;
+                feedback.className = 'feedback incorrect';
+            }
+        }
+        
+        function showTranslationGame() {
+            document.getElementById('translation-screen').classList.add('active');
+            document.getElementById('translation-portuguese').textContent = currentWord.portuguese;
+            document.getElementById('translation-context').textContent = 'Contexto: "' + currentWord.context + '"';
+            document.getElementById('translation-input').value = '';
+            document.getElementById('translation-feedback').classList.add('hidden');
+        }
+        
+        function checkTranslation() {
+            const input = document.getElementById('translation-input');
+            const feedback = document.getElementById('translation-feedback');
+            const userAnswer = input.value.toLowerCase().trim();
+            const correctAnswer = currentWord.english.toLowerCase().trim();
+            
+            feedback.classList.remove('hidden');
+            
+            if (userAnswer === correctAnswer) {
+                feedback.textContent = 'Perfeito! 🎉';
+                feedback.className = 'feedback correct';
+                points += 15;
+                updatePoints();
+            } else {
+                feedback.textContent = 'Não é bem assim. A resposta correta é: ' + currentWord.english;
+                feedback.className = 'feedback incorrect';
+            }
+        }
+        
+        function updatePoints() {
+            document.getElementById('points').textContent = points;
+        }
+        
+        function goHome() {
+            document.getElementById('home-screen').style.display = 'block';
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('translation-screen').classList.remove('active');
+        }
+        
+        // Permitir Enter no campo de tradução
+        document.getElementById('translation-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkTranslation();
+            }
+        });
     </script>
 </body>
 </html>
+```
+
+**Apague todo o código antigo e cole este novo!** Depois clique em "Commit changes". Este código é muito mais simples e não depende de bibliotecas externas! 🚀
